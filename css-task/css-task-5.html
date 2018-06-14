@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>No.5 - 纯 CSS 制作绕中轴旋转的立方体</title>
+  <style>
+    .container {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      perspective: 600px;
+      background-color: #1f1f1f
+    }
+    .box-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      width: 400px;
+      height: 400px;
+      transition: all 15s;
+      transform-style: preserve-3d;
+    }
+    .box-wrap>.box {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border: 2px solid rgb(255, 0, 0);
+      background-color: rgba(255, 0, 0, .2);
+      transform-style: preserve-3d;
+      box-sizing: border-box;
+    }
+    .box.top {
+      transform:rotateY(90deg) translateZ(100px);
+    }
+    .box.bottom {
+      transform:rotateX(-90deg) translateZ(100px);
+    }
+    .box.left {
+      transform:rotateY(-90deg) translateZ(100px);
+    }
+    .box.right {
+      transform:rotateY(90deg) translateZ(100px);
+    }
+    .box.front {
+      transform: translateZ(100px);
+    }
+    .box.back {
+      transform:rotateY(180deg) translateZ(100px);
+    }
+    .box-wrap:hover {
+      transform: rotateY(-360deg);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="box-wrap">
+      <div class="box top"></div>
+      <div class="box bottom"></div>
+      <div class="box left"></div>
+      <div class="box right"></div>
+      <div class="box front"></div>
+      <div class="box back"></div>
+    </div>
+  </div>
+</body>
+</html>
