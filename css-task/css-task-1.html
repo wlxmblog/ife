@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>css task 1</title>
+  <style>
+    .container {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .container>.title {
+      position: relative;
+      text-align: center;
+      font-size: 24px;
+      transition: all .5s cubic-bezier(.03,.46,.77,.78);
+    }
+    .container>.title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 49%;
+      right: 49%;
+      height: 6px;
+      border-radius: 5px;
+      background-color: orange;
+      transition: all .2s ease-in-out;
+    }
+    .container>.title.high-light {
+      color: orange;
+    }
+    .container>.title.high-light::after {
+      left: 0;
+      right: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">天羽蔚灵@一不小心</h1>
+    <button id="title-ctrl" class="btn">切换样式</button>
+  </div>
+  <script type="text/javascript">
+    let Util = {
+      pool: function (...task) {
+        const l = task.length
+        let i = 0
+        return function (...params) {
+          let fn = task[i++ % l]
+          return fn.apply(this, params)
+        }
+      },
+      addClass: function (el) {
+        return function (className) {
+          let rule = new RegExp(className)
+          !rule.test(el.className)
+          ? el.className += ' ' + className
+          : 0
+          return
+        }
+      },
+      removeClass: function (el) {
+        return function (className) {
+          let rule = new RegExp(className)
+          rule.test(el.className)
+          ? el.className = el.className.replace(rule, '')
+          : 0
+          return
+        }
+      }
+    }
+    {
+      let btn = document.getElementById('title-ctrl')
+      let titleEl = document.querySelector('.container>.title')
+      let toggle = Util.pool(
+        Util.addClass(titleEl).bind(null, 'high-light'),
+        Util.removeClass(titleEl).bind(null, 'high-light')
+      )
+      btn.addEventListener('click', toggle)
+      
+      // let task = (msg) => console.log(msg)
+      // let runTasks = Util.pool(
+      //   task.bind(null, 142),
+      //   task.bind(null, 520)
+      // )
+      // setInterval(runTasks, 1000)
+    }
+  </script>
+</body>
+</html>
