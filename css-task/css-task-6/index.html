@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>No.6 - 利用 CSS animation 制作一个炫酷的 Slider</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    li {
+      list-style: none;
+    }
+    .container {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #1f1f1f
+    }
+    .slider-wrap {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 1280px;
+      height: 720px;
+    }
+    .slider {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .slider > li, .thump > li {
+      background-position: 50% 50%;
+      background-size: cover;
+    }
+    .slider > li {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+    .thump {
+      position: absolute;
+      display: flex;
+      flex-direction: row;
+      bottom: 50px;
+      z-index: 10;
+    }
+    .thump > li {
+      position: relative;
+      width: 128px;
+      height: 72px;
+    }
+    .thump > li + li {
+      margin-left: 20px;
+    }
+    .thump > li::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+    }
+    .thump > li:hover::after,
+    .thump > li.active::after {
+      opacity: 0
+    }
+    .slider > li.active {
+      z-index: 1;
+    }
+    /* 动画类部分 */
+    /* 左侧进入 */
+    .left-enter {
+      animation: leftMove .5s ease-out;
+    }
+    @keyframes leftMove {
+      from {
+        transform: translateX(-500px);
+      }
+      to {
+        transform: translateX(0);
+      }
+    }
+    /* 底部进入 */
+    .bottom-enter {
+      animation: topMove .5s ease-out;
+    }
+    @keyframes topMove {
+      from {
+        transform: translateY(350px);
+      }
+      to {
+        transform: translateX(0);
+      }
+    }
+    /* 放大进入 */
+    .to-big-enter {
+      animation: toBig 1s ease-in;
+    }
+    @keyframes toBig {
+      from {
+        transform: scale(.1);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+    /* 缩小进入 */
+    .to-small-enter {
+      animation: toSmall 1s ease-out;
+    }
+    @keyframes toSmall {
+      from {
+        transform: scale(2);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+    /* 旋转 + 缩小混合效果 */
+    .mixin-enter {
+      animation: mixinEnter .7s ease-in-out;
+    }
+    @keyframes mixinEnter {
+      from {
+        transform: rotate(360deg) scale(.1);
+      }
+      to {
+        transform: rotate(0) scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="slider-wrap">
+      <ul class="slider"></ul>
+      <ul class="thump"></ul>
+    </div>
+  </div>
+  <script>
+    {
+      let Util = {
+        /**
+         * @param {DOM} el 要添加class的元素
+         */
+        addClass: function (el) {
+          return function (className) {
+            let rule = new RegExp(className)
+            !rule.test(el.className)
+            ? el.className += ' ' + className
+            : 0
+            return
+          }
+        },
+        /**
+         * @param {DOM} el 要移除class的元素
+         */
+        removeClass: function (el) {
+          return function (className) {
+            let rule = new RegExp(className)
+            rule.test(el.className)
+            ? el.className = el.className.replace(rule, '')
+            : 0
+            return
+          }
+        }
+      }
+      let imgs = [
+      './img/1.jpg',
+      './img/4.jpg',
+      './img/5.jpg',
+      './img/6.jpg',
+      './img/7.jpg']
+      let effects = [
+      'left-enter',
+      'bottom-enter',
+      'to-big-enter',
+      'to-small-enter',
+      'mixin-enter']
+      let sliderLen = imgs.length
+      let thump = document.querySelector('.slider-wrap>.thump')
+      let slider = document.querySelector('.slider-wrap>.slider')
+      let imgList = '' // 图片列表字符串模板
+      let sliderList = []
+      let lastTimeThump = null // 用于记录上次点击元素
+      let lastTimeIndex = 0 // 用于记录上次点击元素的索引
+      // imgs.map(img => imgList += `<li data-id=${} style='background-image: url(${img});'></li>`)
+      imgs.forEach((img, index) => {
+        index == lastTimeIndex // 默认选中的元素
+        ? imgList += `<li data-id=${index} class='active' style='background-image: url(${img});'></li>`
+        : imgList += `<li data-id=${index} style='background-image: url(${img});'></li>`
+      })
+      thump.innerHTML = imgList
+      slider.innerHTML = imgList
+      sliderList = [...slider.querySelectorAll('li')]
+      thumpList = [...thump.querySelectorAll('li')]
+      /** 处理点击切换图片
+       * @param  {Event} event 点击事件
+       */
+      let handleClick = function (event) {
+        let tag = event.target
+        let id = 0
+        // let effectId = Math.floor(Math.random() * effects.length)
+        if (tag.nodeName == 'LI') {
+          id = tag.dataset['id']
+          if (lastTimeIndex == id) { //是否至少已点击过一次
+            return 
+          }
+
+          Util.removeClass(sliderList[lastTimeIndex])(effects[lastTimeIndex] + ' active')
+          Util.removeClass(thumpList[lastTimeIndex])('active')
+          lastTimeIndex = id
+          lastTimeThump = tag
+
+          Util.addClass(tag)('active')
+          Util.addClass(sliderList[id])(effects[id] + ' active')
+        }
+      }
+      /**
+       * 初始化
+       */
+      let init = function () {
+        thump.addEventListener('click', handleClick, false)
+      }
+      init()
+    }
+  </script>
+</body>
+</html>
