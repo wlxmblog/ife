@@ -201,7 +201,7 @@
       thump.innerHTML = imgList
       slider.innerHTML = imgList
       sliderList = [...slider.querySelectorAll('li')]
-      thumpList = [...thump.querySelectorAll('li')]
+      lastTimeThump = thump.querySelector('li:last-child')
       /** 处理点击切换图片
        * @param  {Event} event 点击事件
        */
@@ -216,7 +216,7 @@
           }
 
           Util.removeClass(sliderList[lastTimeIndex])(effects[lastTimeIndex] + ' active')
-          Util.removeClass(thumpList[lastTimeIndex])('active')
+          Util.removeClass(lastTimeThump)('active')
           lastTimeIndex = id
           lastTimeThump = tag
 
