@@ -194,6 +194,8 @@
      */
     let isValid = function() {
       if (isValidArr.indexOf(false) != -1) {
+        console.log(isValidArr)
+        $('button[type=submit]').removeClass('animated')
         return
       }
       $('button[type=submit]').addClass('animated infinite pulse')
@@ -217,15 +219,14 @@
       this.value != '' ?
         (
           $form__label__content.addClass('up'),
-          isValidArr[id] = true,
-          isValid()
+          isValidArr[id] = true
         ) :
         (
           $form__label__content.removeClass('up'),
           isValidArr[id] = false
         )
+      isValid()
     })
-
   })
 </script>
 
