@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>No.8 - 把 AE 动画转换成 Web 原生动画 - 2</title>
+  <style>
+    .container {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .card {
+      width: 240px;
+      height: 480px;
+      transition: all .2s;
+      box-shadow: 0 0 2px #9f9f9f;
+    }
+    .card:hover {
+      box-shadow: 0 2px 4px #9f9f9f;
+      transform: translateY(-2px);
+    }
+    .card > .top {
+      background-color: #f0f
+    }
+    .card > .bottom {
+      padding: 15px;
+    }
+    .card > .bottom p {
+      font-size: 12px;
+      color: #6f6f6f;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card-list">
+      <div class="card" data-id=0>
+        <div id="card-icon-0" class="top">
+
+        </div>
+        <div class="bottom">
+          <h4 class="title">计算机</h4>
+          <p class="text">沈阳师范大学，沈阳师范大学沈阳师范大学软件学院</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.bootcss.com/bodymovin/4.13.0/bodymovin.min.js"></script>
+  <script>
+    {
+      let animationDataModels = [
+        './hover-data.json'
+      ]
+      let cardIconAnimations = []
+      let cardList = document.querySelector('.card-list')
+      let cardArr = cardList.querySelectorAll('.card')
+      let len = cardArr.length
+      for (let i = 0; i < len; i++) {
+        cardIconAnimations[i] =
+        bodymovin.loadAnimation({
+          container: document.getElementById('card-icon-' + i),
+          renderer: 'svg',
+          loop: false,
+          autoplay: false,
+          path: animationDataModels[i]
+        })
+      }
+      let handleCardToggle = function (event) {
+        id = this.dataset['id']
+        console.log(event)
+        event.type == 'mouseover'
+        ? cardIconAnimations[id].play()
+        : cardIconAnimations[id].stop()
+      }
+      Array.prototype.forEach.call(cardArr, el => {
+        el.addEventListener('mouseover', handleCardToggle, false)
+        el.addEventListener('mouseout', handleCardToggle, false)
+      })
+    }
+  </script>
+</body>
+</html>
