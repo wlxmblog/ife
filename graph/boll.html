@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>小球</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    #app {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+    .boll {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #f00;
+      /*transition: all .2s ease-in-out;*/
+    }
+    .control {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 35vw;
+      height: 25vw;
+      z-index: 1
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="control">
+      <input type="number" id="InputSpeed" placeholder="速率">
+      <input type="number" id="InputNum" placeholder="数量">
+      <button class="start">开始</botton>
+    </div>
+  </div>
+  <script type="module">
+    const changeColor = (el) => {
+      el.style.backgroundColor =
+        `rgb(
+          ${255 * Math.random()},
+          ${255 * Math.random()},
+          ${255 * Math.random()}
+        )`
+    }
+    /**
+     * @param  {HTMLElement} p        容器
+     * @param  {HTMLElement} c        运动元素
+     * @param  {Number} speed    运动速率
+     * @param  {Number} radius   发射角度
+     * @return {Number}          请求 ID ，是回调列表中唯一的标识
+     */
+    const launch = (p, c, speed, radius, callback) => {
+      let t, r, b, l, w, h
+      w = c.offsetWidth
+      h = c.offsetHeight
+      t = p.offsetTop
+      l = p.offsetLeft
+      r = l + p.offsetWidth - w
+      b = t + p.offsetHeight - h
+
+      let xs, ys, x, y, R
+      x = y = 0
+      R = Math.PI / 180 * radius
+      xs = Math.cos(R) * speed
+      ys = Math.sin(R) * speed
+
+      const anime = () => {
+        x = c.offsetLeft + xs
+        y = c.offsetTop + ys
+        x <= l
+        ? (x = l, xs = -xs, callback(c))
+        : (x >= r ? (x = r, xs = -xs, callback(c)) : 1)
+        y <= t
+        ? (y = t, ys = -ys, callback(c))
+        : (y >= b ? (y = b, ys = -ys, callback(c)) : 1)
+        c.style.left = x + 'px'
+        c.style.top = y + 'px'
+        return requestAnimationFrame(anime)
+      }
+      return requestAnimationFrame(anime)
+    }
+    /**
+     * @param  {HTMLElement} p        容器
+     * @param  {Number} speed         运动速率
+     * @param  {Number} n             小球数量
+     * @return {Array}                任务队列
+     */
+    const createBoll = (p, speed, n) => {
+      let c, que = [], i = 0
+      while(i < n) {
+        c = document.createElement('div')
+        c.className = 'boll'
+        c.setAttribute('data-id', i)
+        que.push(
+          launch.bind(
+            null, app, c, speed, Math.random() * 360, changeColor
+          )
+        )
+        p.appendChild(c)
+        i++
+      }
+      return que
+    }
+
+    // test
+    const start = () => {
+      let s = InputSpeed.value
+      let n = InputNum.value
+      let tasks = createBoll(app, s ? s : 15, n ? n : 20)
+      return tasks.map(task => task())
+    }
+    let startBtn = document.querySelector('.start')
+
+    startBtn.onclick = () => {
+      startBtn.setAttribute('disabled', true)
+      startBtn.parentNode.style.opacity = 0
+      start()
+    }
+  </script>
+</body>
+</html>
